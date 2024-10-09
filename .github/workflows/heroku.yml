@@ -1,0 +1,37 @@
+name: Control Heroku Dyno
+
+on:
+  schedule:
+    - cron: '0 8 * * *' # Ejecutar a las 8:00 AM UTC
+    - cron: '0 16 * * *' # Ejecutar a las 4:00 PM UTC
+
+jobs:
+  control-dyno:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Encender o Apagar Dyno
+        run: |
+          # Cambia esto por tu API Key y el nombre de tu app
+          HEROKU_API_KEY="HRKU-9ea95397-4514-4322-860a-980ba0c0de13"
+          APP_NAME="programa" # Cambia esto por el nombre de tu aplicación
+
+          # Hora actual en formato de 24 horas
+          HOUR=$(date +'%H')
+
+          if [ "$HOUR" -eq 8 ]; then
+            echo "Encendiendo el Dyno..."
+            curl -n -X PATCH "https://api.heroku.com/apps/$APP_NAME/formation/web" \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/vnd.heroku+json; version=3" \
+            -H "Authorization: Bearer $HEROKU_API_KEY" \
+            -d '{"quantity":1}'
+          elif [ "$HOUR" -eq 16 ]; then
+            echo "Apagando el Dyno..."
+            curl -n -X PATCH "https://api.heroku.com/apps/$APP_NAME/formation/web" \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/vnd.heroku+json; version=3" \
+            -H "Authorization: Bearer $HEROKU_API_KEY" \
+            -d '{"quantity":0}'
+          else
+            echo "No es hora de encender o apagar el Dyno."
+          fi
