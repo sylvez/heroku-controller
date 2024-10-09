@@ -1,10 +1,9 @@
 name: Control Heroku Dyno
 
 on:
-  workflow_dispatch:  # Permite la ejecución manual
   schedule:
-    - cron: '0 8 * * *' # Ejecutar a las 8:00 AM UTC
-    - cron: '0 16 * * *' # Ejecutar a las 4:00 PM UTC
+    - cron: '0 14 * * *' # Ejecutar a las 8:00 AM UTC-6 (2:00 PM UTC)
+    - cron: '0 22 * * *' # Ejecutar a las 4:00 PM UTC-6 (10:00 PM UTC)
 
 jobs:
   control-dyno:
@@ -19,14 +18,14 @@ jobs:
           # Hora actual en formato de 24 horas
           HOUR=$(date +'%H')
 
-          if [ "$HOUR" -eq 8 ]; then
+          if [ "$HOUR" -eq 14 ]; then
             echo "Encendiendo el Dyno..."
             curl -n -X PATCH "https://api.heroku.com/apps/$APP_NAME/formation/web" \
             -H "Content-Type: application/json" \
             -H "Accept: application/vnd.heroku+json; version=3" \
             -H "Authorization: Bearer $HEROKU_API_KEY" \
             -d '{"quantity":1}'
-          elif [ "$HOUR" -eq 16 ]; then
+          elif [ "$HOUR" -eq 22 ]; then
             echo "Apagando el Dyno..."
             curl -n -X PATCH "https://api.heroku.com/apps/$APP_NAME/formation/web" \
             -H "Content-Type: application/json" \
