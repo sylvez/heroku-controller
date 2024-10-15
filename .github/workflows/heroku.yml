@@ -1,4 +1,4 @@
-name: Control Heroku Dyno
+name: Control Railway Server
 
 on:
   schedule:
@@ -7,32 +7,28 @@ on:
   workflow_dispatch: # Permite la ejecución manual del workflow
 
 jobs:
-  control-dyno:
+  control-server:
     runs-on: ubuntu-latest
     steps:
-      - name: Encender o Apagar Dyno
+      - name: Encender o Apagar Servidor
         run: |
-          # Cambia esto por tu API Key y el nombre de tu app
-          HEROKU_API_KEY="HRKU-9ea95397-4514-4322-860a-980ba0c0de13"
-          APP_NAME="programa" # Cambia esto por el nombre de tu aplicación
+          # Cambia esto por tu API Key y el ID del proyecto
+          RAILWAY_API_KEY="feef0e65-2959-4585-8c8c-0966b502e8fc"  # Tu API Key
+          PROJECT_ID="e2b9041a-af2d-4349-9f0b-643a5b56451d"  # Tu Project ID
 
           # Hora actual en formato de 24 horas
           HOUR=$(date +'%H')
 
           if [ "$HOUR" -eq 14 ]; then
-            echo "Encendiendo el Dyno..."
-            curl -n -X PATCH "https://api.heroku.com/apps/$APP_NAME/formation/web" \
-            -H "Content-Type: application/json" \
-            -H "Accept: application/vnd.heroku+json; version=3" \
-            -H "Authorization: Bearer $HEROKU_API_KEY" \
-            -d '{"quantity":1}'
+            echo "Encendiendo el servidor..."
+            curl -n -X PATCH "https://railway.app/api/v1/project/$PROJECT_ID" \
+            -H "Authorization: Bearer $RAILWAY_API_KEY" \
+            -d '{"enabled": true}'
           elif [ "$HOUR" -eq 22 ]; then
-            echo "Apagando el Dyno..."
-            curl -n -X PATCH "https://api.heroku.com/apps/$APP_NAME/formation/web" \
-            -H "Content-Type: application/json" \
-            -H "Accept: application/vnd.heroku+json; version=3" \
-            -H "Authorization: Bearer $HEROKU_API_KEY" \
-            -d '{"quantity":0}'
+            echo "Apagando el servidor..."
+            curl -n -X PATCH "https://railway.app/api/v1/project/$PROJECT_ID" \
+            -H "Authorization: Bearer $RAILWAY_API_KEY" \
+            -d '{"enabled": false}'
           else
-            echo "No es hora de encender o apagar el Dyno."
+            echo "No es hora de encender o apagar el servidor."
           fi
